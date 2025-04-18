@@ -17,7 +17,7 @@ export const SLOT_MACHINE = {
 // Reel Configuration
 export const REEL = {
   RADIUS: 1.8,
-  HEIGHT: 0.6,
+  THICKNESS: 0.6,
   SYMBOL: {
     SIZE: 0.5,
     OFFSET: 1.8,

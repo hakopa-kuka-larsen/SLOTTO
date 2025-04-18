@@ -263,7 +263,7 @@ const Reel: React.FC<ReelProps> = ({
       {/* Outer prism */}
       <mesh ref={reelRef} material={outerMaterial}>
         <primitive
-          object={createPrismGeometry(REEL.RADIUS, REEL.HEIGHT, SEGMENTS)}
+          object={createPrismGeometry(REEL.RADIUS, REEL.THICKNESS, SEGMENTS)}
         />
       </mesh>
 
@@ -272,7 +272,7 @@ const Reel: React.FC<ReelProps> = ({
         <primitive
           object={createPrismGeometry(
             REEL.RADIUS - 0.1,
-            REEL.HEIGHT - 0.1,
+            REEL.THICKNESS - 0.05,
             SEGMENTS
           )}
         />
