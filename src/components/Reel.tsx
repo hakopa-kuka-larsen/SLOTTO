@@ -1,6 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Vector3, Mesh, BufferGeometry, Float32BufferAttribute } from 'three'
+import {
+  Vector3,
+  Mesh,
+  BufferGeometry,
+  Float32BufferAttribute,
+  MeshStandardMaterial,
+} from 'three'
 import { Text } from '@react-three/drei'
 import {
   SYMBOLS,
@@ -14,6 +20,8 @@ import { weightedShuffle } from '../utils/probability'
 import { normalizeAngle } from '../utils/geometry'
 import { useGame } from '../context/GameContext'
 import { getRandomInt } from '../utils/random'
+import TrailEffect from './TrailEffect'
+import ExplosionEffect from './ExplosionEffect'
 
 // Reference line position for scoring
 const REFERENCE_LINE_Z = 2.2
@@ -28,11 +36,11 @@ interface ReelProps {
   selectedSymbol?: Symbol | null
 }
 
-const SEGMENTS = 20 // Number of sides in the prism
-const SEGMENT_ANGLE = (Math.PI * 2) / SEGMENTS // Angle between each segment
-const SPIN_COOLDOWN = 500 // Half a second cooldown between spins
-const SYMBOL_SPACING = 2 // Space between symbols
-const SNAP_DURATION = 0.5 // Duration of snap animation in seconds
+const SEGMENTS = 8 // Reduced number of sides for a more solid look
+const SEGMENT_ANGLE = (Math.PI * 2) / SEGMENTS
+const SPIN_COOLDOWN = 500
+const SYMBOL_SPACING = 2
+const SNAP_DURATION = 0.5
 
 /**
  * Creates a prism geometry with the specified number of sides
@@ -112,10 +120,10 @@ const Reel: React.FC<ReelProps> = ({
   const [lastSelectedSymbol, setLastSelectedSymbol] = useState<Symbol | null>(
     null
   )
+  const [showExplosion, setShowExplosion] = useState(false)
 
   // Create an array of exactly 20 symbols with weighted distribution
   const createWeightedSymbols = (): Symbol[] => {
-    // Create a weighted pool of symbols based on SYMBOL_WEIGHTS
     const weightedPool: Symbol[] = []
     SYMBOLS.forEach((symbol, index) => {
       const weight = SYMBOL_WEIGHTS[index]
@@ -124,7 +132,6 @@ const Reel: React.FC<ReelProps> = ({
       }
     })
 
-    // Create array of 20 symbols by randomly selecting from the weighted pool
     return Array(20)
       .fill(null)
       .map(() => {
@@ -155,6 +162,7 @@ const Reel: React.FC<ReelProps> = ({
       setSnapProgress(0)
       setLastSelectedSymbol(null)
       hasCompletedRef.current = false
+      setShowExplosion(false)
     }
   }, [isSpinning])
 
@@ -173,168 +181,124 @@ const Reel: React.FC<ReelProps> = ({
     } else if (snapProgress < 1) {
       // Snap animation
       const closestPosition = getClosestPosition()
-      const targetRotation = Math.atan2(closestPosition.z, 1) // Calculate exact angle to center
+      const targetRotation = Math.atan2(closestPosition.z, 1)
 
       setSnapProgress((prev) => {
         const newProgress = Math.min(prev + delta / SNAP_DURATION, 1)
-        const easedProgress = 1 - Math.pow(1 - newProgress, 3) // Cubic ease-out
+        const easedProgress = 1 - Math.pow(1 - newProgress, 3)
         if (reelRef.current) {
           reelRef.current.rotation.x = targetRotation * easedProgress
         }
         return newProgress
       })
 
-      // When snap is complete, record the selected symbol
+      // When snap is complete, record the selected symbol and show explosion
       if (
         snapProgress >= 0.99 &&
         !lastSelectedSymbol &&
         !hasCompletedRef.current &&
         reelRef.current
       ) {
-        hasCompletedRef.current = true // Set this first to prevent multiple selections
+        hasCompletedRef.current = true
+        setShowExplosion(true)
 
-        // Calculate the selected symbol index based on the current rotation
         const currentRotation = normalizeAngle(reelRef.current.rotation.x)
         const selectedIndex =
           Math.floor((currentRotation / (Math.PI * 2)) * SEGMENTS) % SEGMENTS
         const selectedSymbol = reelSymbols.current[selectedIndex]
 
-        // Use setTimeout to make the selection asynchronous
-        setTimeout(() => {
-          setLastSelectedSymbol(selectedSymbol)
-          if (onSymbolSelected) {
-            onSymbolSelected(selectedSymbol, reelIndex)
-          }
-          if (onComplete) {
-            onComplete()
-          }
-        }, 100) // Small delay to ensure smooth animation
-
-        // Reset rotation after a delay
-        setTimeout(() => {
-          if (reelRef.current) {
-            reelRef.current.rotation.x = 0
-          }
-        }, SPIN_COOLDOWN)
+        setLastSelectedSymbol(selectedSymbol)
+        if (onSymbolSelected) {
+          onSymbolSelected(selectedSymbol, reelIndex)
+        }
+        if (onComplete) {
+          onComplete()
+        }
       }
     }
   })
 
+  // Create materials
+  const outerMaterial = new MeshStandardMaterial({
+    color: theme === 'matrix' ? '#00ff00' : '#ffffff',
+    metalness: 0.5,
+    roughness: 0.5,
+    wireframe: theme === 'matrix',
+    transparent: true,
+    opacity: 0.8,
+  })
+
+  const innerMaterial = new MeshStandardMaterial({
+    color: theme === 'matrix' ? '#00ff00' : '#e0e0e0',
+    metalness: 0.3,
+    roughness: 0.7,
+    wireframe: theme === 'matrix',
+    transparent: true,
+    opacity: 0.6,
+  })
+
   return (
     <group position={new Vector3(...position)}>
-      <mesh ref={reelRef} rotation={[0, 0, Math.PI / 2]}>
-        {/* Outer prism */}
+      {/* Trail effect when spinning */}
+      {isSpinning && reelRef.current && (
+        <TrailEffect
+          target={reelRef.current}
+          length={10}
+          color={theme === 'matrix' ? '#00ff00' : '#ffffff'}
+          width={0.05}
+        />
+      )}
+
+      {/* Explosion effect when stopping */}
+      {showExplosion && (
+        <ExplosionEffect
+          position={[0, 0, REFERENCE_LINE_Z]}
+          intensity={1.5}
+          duration={1}
+          particleSize={0.1}
+          active={true}
+        />
+      )}
+
+      {/* Outer prism */}
+      <mesh ref={reelRef} material={outerMaterial}>
         <primitive
-          object={createPrismGeometry(REEL.RADIUS, REEL.THICKNESS, SEGMENTS)}
+          object={createPrismGeometry(REEL.RADIUS, REEL.HEIGHT, SEGMENTS)}
         />
-        <meshBasicMaterial
-          color={theme === 'matrix' ? 'white' : '#ffffff'}
-          wireframe={theme === 'matrix'}
-          wireframeLinewidth={2}
-        />
-
-        {/* Inner prism */}
-        <mesh>
-          <primitive
-            object={createPrismGeometry(
-              REEL.RADIUS - 0.1,
-              REEL.THICKNESS - 0.05,
-              SEGMENTS
-            )}
-          />
-          <meshBasicMaterial
-            color={theme === 'matrix' ? '#2a2a2a' : '#333333'}
-            wireframe={theme === 'matrix'}
-            wireframeLinewidth={1}
-          />
-        </mesh>
-
-        {/* Black outline */}
-        <mesh>
-          <primitive
-            object={createPrismGeometry(
-              REEL.RADIUS + 0.02,
-              REEL.THICKNESS + 0.02,
-              SEGMENTS
-            )}
-          />
-          <meshBasicMaterial
-            color="#000000"
-            wireframe={true}
-            wireframeLinewidth={3}
-          />
-        </mesh>
-
-        {/* Symbols on each face */}
-        {reelSymbols.current.map((symbol, index) => {
-          // Calculate angle for each symbol to ensure equidistant placement
-          // Each symbol should be exactly 18 degrees apart (360° ÷ 20 segments)
-          const angle = (index / 20) * Math.PI * 2 // Use 20 for exact spacing
-          // Calculate position on the circumference
-          const x = REEL.RADIUS * Math.cos(angle)
-          const z = REEL.RADIUS * Math.sin(angle)
-          const isSelected = !isSpinning && symbol === lastSelectedSymbol
-
-          return (
-            <group key={index} position={[x, 0, z]}>
-              {/* Rotate the group to position the symbol on the reel surface */}
-              <group rotation={[0, 0, Math.PI / 2]}>
-                {/* Rotate the symbol to face the center of the reel and match the curvature */}
-                <group rotation={[angle, 0, 0]}>
-                  <Text
-                    position={[0, 0, 0.001]}
-                    fontSize={REEL.SYMBOL.SIZE}
-                    color={
-                      isSelected
-                        ? '#00FF00'
-                        : theme === 'matrix'
-                        ? SYMBOL_COLORS[symbol]
-                        : '#000000'
-                    }
-                    anchorX="center"
-                    anchorY="middle"
-                    renderOrder={1}
-                    fillOpacity={isSelected ? 1 : 0.9}
-                    outlineWidth={isSelected ? 0.02 : 0.01}
-                    outlineColor={theme === 'matrix' ? '#00FF00' : '#000000'}
-                    outlineOpacity={isSelected ? 0.5 : 0.3}
-                    // Apply additional rotation to make symbols follow the curvature
-                    // Offset by 90 degrees (Math.PI/2) to make symbols face the right way
-                    rotation={[0, 0, -angle + Math.PI / 2]}
-                  >
-                    {symbol}
-                  </Text>
-                </group>
-              </group>
-            </group>
-          )
-        })}
-
-        {/* Black horizontal lines between segments */}
-        {Array.from({ length: 20 }).map((_, index) => {
-          const angle = (index / 20) * Math.PI * 2
-          const x = REEL.RADIUS * Math.cos(angle)
-          const z = REEL.RADIUS * Math.sin(angle)
-
-          // Calculate the width of the line based on the segment spacing
-          const lineWidth = ((Math.PI * 2 * REEL.RADIUS) / 20) * 0.8 // 80% of segment width
-
-          return (
-            <group key={`line-${index}`} position={[x, 0, z]}>
-              {/* Rotate the group to position the line on the reel surface */}
-              <group rotation={[0, 0, Math.PI / 2]}>
-                {/* Rotate the line to face the center of the reel */}
-                <group rotation={[angle, 0, 0]}>
-                  <mesh position={[0, 0, 0.002]}>
-                    <planeGeometry args={[lineWidth, 0.02]} />
-                    <meshBasicMaterial color="#000000" />
-                  </mesh>
-                </group>
-              </group>
-            </group>
-          )
-        })}
       </mesh>
+
+      {/* Inner prism */}
+      <mesh material={innerMaterial}>
+        <primitive
+          object={createPrismGeometry(
+            REEL.RADIUS - 0.1,
+            REEL.HEIGHT - 0.1,
+            SEGMENTS
+          )}
+        />
+      </mesh>
+
+      {/* Symbols */}
+      {reelSymbols.current.map((symbol, index) => {
+        const angle = (index / SEGMENTS) * Math.PI * 2
+        const x = Math.cos(angle) * (REEL.RADIUS - 0.2)
+        const z = Math.sin(angle) * (REEL.RADIUS - 0.2)
+
+        return (
+          <group key={index} position={[x, 0, z]} rotation={[0, -angle, 0]}>
+            <Text
+              position={[0, 0, 0]}
+              rotation={[Math.PI / 2, 0, 0]}
+              fontSize={0.3}
+              color={SYMBOL_COLORS[symbol]}
+              anchorX="center"
+              anchorY="middle"
+            >
+              {symbol}
+            </Text>
+          </group>
+        )
+      })}
     </group>
   )
 }
