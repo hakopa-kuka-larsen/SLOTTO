@@ -9,7 +9,12 @@ import {
   LineBasicMaterial,
 } from 'three'
 import { Text } from '@react-three/drei'
-import { SYMBOLS, SYMBOL_COLORS, Symbol } from '../utils/symbols'
+import {
+  SYMBOLS,
+  SYMBOL_COLORS,
+  SYMBOL_WEIGHTS,
+  Symbol,
+} from '../utils/symbols'
 import { REEL } from '../utils/constants'
 import { weightedShuffle } from '../utils/probability'
 
@@ -104,11 +109,29 @@ const Reel: React.FC<ReelProps> = ({
   const isSnapping = useRef(false)
   const snapAnimationProgress = useRef(0)
   const snapStartRotation = useRef(0)
-  const reelSymbols = useRef(
-    Array(20)
+
+  // Create an array of exactly 20 symbols with weighted distribution
+  const createWeightedSymbols = (): Symbol[] => {
+    // Create a weighted array based on SYMBOL_WEIGHTS
+    const weightedSymbols: Symbol[] = []
+    SYMBOLS.forEach((symbol, index) => {
+      const weight = SYMBOL_WEIGHTS[index]
+      for (let i = 0; i < weight; i++) {
+        weightedSymbols.push(symbol)
+      }
+    })
+
+    // Shuffle the weighted array
+    const shuffled = [...weightedSymbols].sort(() => Math.random() - 0.5)
+
+    // Take exactly 20 symbols, repeating if necessary
+    return Array(20)
       .fill(0)
-      .map((_, i) => SYMBOLS[i % SYMBOLS.length])
-  )
+      .map((_, i) => shuffled[i % shuffled.length])
+  }
+
+  const reelSymbols = useRef<Symbol[]>(createWeightedSymbols())
+
   const hasCompletedSnap = useRef(false)
   const lineRef = useRef<Line>(null)
   const [canSpin, setCanSpin] = useState(true)
