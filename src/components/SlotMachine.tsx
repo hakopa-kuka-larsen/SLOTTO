@@ -111,12 +111,7 @@ const SlotMachine: React.FC = () => {
         }}
       >
         <Scene />
-        <OrbitControls
-          enableZoom={true}
-          enablePan={false}
-          minDistance={30}
-          maxDistance={80}
-        />
+        <OrbitControls enableZoom={true} enablePan={false} />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <group>
