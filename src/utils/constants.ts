@@ -16,16 +16,17 @@ export const SLOT_MACHINE = {
 
 // Reel Configuration
 export const REEL = {
-  RADIUS: 2,
-  THICKNESS: 0.8,
+  RADIUS: 1.8,
+  THICKNESS: 0.6,
   SYMBOL: {
     SIZE: 0.5,
-    OFFSET: 2, // Same as REEL.RADIUS for centering
+    OFFSET: 1.8,
   },
   SPIN: {
     INITIAL_SPEED: 15,
-    DECELERATION: 0.98,
-    MIN_SPEED: 0.1,
+    DECELERATION: 0.99,
+    MIN_SPEED: 0.05,
+    SNAP_SPEED: 5, // Speed at which the reel snaps to the final position
   },
 }
 
@@ -37,8 +38,8 @@ export const LEVER = {
   ROTATION: {
     START: -Math.PI / 4, // -45 degrees
     END: Math.PI / 4, // 45 degrees
-    RETURN_SPEED: 0.1,
-    PULL_SPEED: 2,
+    RETURN_SPEED: 0.2,
+    PULL_SPEED: 3,
   },
   COLORS: {
     BASE: '#666666',

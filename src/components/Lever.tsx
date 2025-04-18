@@ -20,8 +20,8 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
   const isReturning = useRef(false)
   const springEffect = useRef(0)
   const pauseTimer = useRef(0)
-  const PAUSE_DURATION = 0.5 // Pause for 0.5 seconds at the bottom
-  const RETURN_DURATION = 1.0 // Return over 1 second
+  const PAUSE_DURATION = 0.3 // Reduced from 0.5 seconds
+  const RETURN_DURATION = 0.7 // Reduced from 1.0 seconds
 
   // Handle lever animation
   useFrame((_, delta) => {
@@ -48,7 +48,9 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
         returnProgress.current = 0
         pauseTimer.current = 0
         springEffect.current = 0.2 // Stronger initial spring effect
-        onPull()
+
+        // The onPull callback is now called from the SlotMachine component
+        // after a delay to ensure the lever is at the bottom of its arc
       }
 
       // Apply dramatic spring effect at the end of the pull
@@ -102,6 +104,8 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
       setIsPulling(true)
       pullProgress.current = 0
       springEffect.current = 0
+      // Call onPull immediately to trigger the lever pull event
+      onPull()
     }
   }
 

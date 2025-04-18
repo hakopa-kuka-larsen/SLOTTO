@@ -25,6 +25,18 @@ export const SYMBOL_COLORS: Record<Symbol, string> = {
   '🍒': '#7FFF00', // chartreuse
 }
 
+// Point values for each symbol (same order as SYMBOLS)
+export const SYMBOL_POINTS: Record<Symbol, number> = {
+  '🍎': 5, // apple
+  '🍐': 10, // pear
+  '🍊': 15, // orange
+  '🍋': 20, // lemon
+  '🍇': 25, // grapes
+  '🍉': 30, // watermelon
+  '🍓': 35, // strawberry
+  '🍒': 40, // cherries
+}
+
 // Weights for each symbol (same order as SYMBOLS)
 export const SYMBOL_WEIGHTS = [
   2, // apple

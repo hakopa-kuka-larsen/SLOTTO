@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useGame } from '../context/GameContext'
 import '../styles/animations.css'
+import soundManager from '../utils/sounds'
 
 interface ToggleProps {
   isActive: boolean
@@ -70,6 +71,8 @@ const GameControls: React.FC = () => {
   const controlsRef = useRef<HTMLDivElement>(null)
   const buttonSize = 48 // Size of the circular button
   const margin = 20 // Margin from the edge of the screen
+  const [isMuted, setIsMuted] = React.useState(false)
+  const [volume, setVolume] = React.useState(0.5)
 
   // Handle click outside
   useEffect(() => {
@@ -87,6 +90,21 @@ const GameControls: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const toggleMute = () => {
+    soundManager.toggleMute()
+    setIsMuted(!isMuted)
+  }
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value)
+    setVolume(newVolume)
+    soundManager.setVolume(newVolume)
+  }
+
+  const toggleTheme = () => {
+    setTheme(theme === 'matrix' ? 'default' : 'matrix')
+  }
 
   return (
     <div
@@ -135,8 +153,8 @@ const GameControls: React.FC = () => {
         >
           <Toggle
             isActive={theme === 'matrix'}
-            onClick={() => setTheme(theme === 'matrix' ? 'minimal' : 'matrix')}
-            label={theme === 'matrix' ? 'Matrix Theme' : 'Minimal Theme'}
+            onClick={toggleTheme}
+            label={theme === 'matrix' ? 'Matrix Theme' : 'Default Theme'}
           />
           <Toggle
             isActive={screenShakeEnabled}
@@ -150,6 +168,69 @@ const GameControls: React.FC = () => {
             }
             label={cameraMode === 'free' ? 'Free Camera' : 'Fixed Camera'}
           />
+
+          {/* Volume Control */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                color: '#00ff00',
+                fontFamily: 'monospace',
+                fontSize: '14px',
+              }}
+            >
+              Volume
+            </span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={handleVolumeChange}
+              style={{
+                flex: 1,
+                height: '4px',
+                WebkitAppearance: 'none',
+                background: `linear-gradient(to right, #00ff00 ${
+                  volume * 100
+                }%, #666666 ${volume * 100}%)`,
+                borderRadius: '2px',
+                outline: 'none',
+                opacity: 0.7,
+                transition: 'opacity 0.2s',
+                cursor: 'pointer',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.opacity = '1'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.opacity = '0.7'
+              }}
+            />
+            <button
+              onClick={toggleMute}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#00ff00',
+                cursor: 'pointer',
+                fontSize: '16px',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.2s',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+              }}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+          </div>
         </div>
       </div>
 

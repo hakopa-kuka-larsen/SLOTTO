@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 
-type Theme = 'matrix' | 'minimal'
+type Theme = 'matrix' | 'default'
 type CameraMode = 'fixed' | 'free'
 
 interface GameContextType {
@@ -17,9 +17,9 @@ const GameContext = createContext<GameContextType | undefined>(undefined)
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<Theme>('matrix')
+  const [theme, setTheme] = useState<Theme>('default')
   const [screenShakeEnabled, setScreenShakeEnabled] = useState(true)
-  const [cameraMode, setCameraMode] = useState<CameraMode>('fixed')
+  const [cameraMode, setCameraMode] = useState<CameraMode>('free')
 
   return (
     <GameContext.Provider

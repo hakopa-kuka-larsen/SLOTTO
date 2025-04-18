@@ -3,15 +3,19 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Reel from './Reel'
 import Lever from './Lever'
-import AxisHelper from './AxisHelper'
 import SlotMachineFrame from './SlotMachineFrame'
+import AxisHelper from './AxisHelper'
+import LogFrame from './LogFrame'
+import GeometricLine from './GeometricLine'
+import ParticleEffects from './ParticleEffects'
 import { CAMERA, LIGHTING, REEL_SPINNING, REEL } from '../utils/constants'
 import { bellCurve } from '../utils/probability'
-import { Symbol, SYMBOLS } from '../utils/symbols'
+import { Symbol, SYMBOLS, SYMBOL_POINTS } from '../utils/symbols'
 import { useGame } from '../context/GameContext'
 import GameControls from './GameControls'
 import { Vector3 } from 'three'
 import { useCameraTransition } from '../hooks/useCameraTransition'
+import soundManager from '../utils/sounds'
 
 interface DebugDisplayProps {
   reelIndex: number
@@ -52,12 +56,23 @@ const SlotMachine: React.FC = () => {
   const { theme, screenShakeEnabled } = useGame()
   const [isSpinning, setIsSpinning] = useState(false)
   const [reelStates, setReelStates] = useState([0, 0, 0])
-  const completedReels = useRef<Set<number>>(new Set())
+  const completedReelsRef = useRef<Set<number>>(new Set())
   const [selectedSymbols, setSelectedSymbols] = useState<Symbol[]>(
     Array(5).fill(SYMBOLS[0])
   )
+  const [totalScore, setTotalScore] = useState(0)
   const isDragging = useRef(false)
   const shakeRef = useRef<HTMLDivElement>(null)
+  const [showParticles, setShowParticles] = useState(false)
+  const [particleColor, setParticleColor] = useState('#FFD700') // Gold color for wins
+
+  // Start background music when component mounts
+  useEffect(() => {
+    soundManager.play('BACKGROUND')
+    return () => {
+      soundManager.stopBackground()
+    }
+  }, [])
 
   /**
    * Handle the lever pull event
@@ -73,9 +88,8 @@ const SlotMachine: React.FC = () => {
         'shake 0.5s cubic-bezier(.36,.07,.19,.97)'
     }
 
-    setIsSpinning(true)
     // Reset completed reels tracking
-    completedReels.current.clear()
+    completedReelsRef.current.clear()
 
     // Reset selected symbols
     setSelectedSymbols(Array(5).fill(SYMBOLS[0]))
@@ -87,38 +101,93 @@ const SlotMachine: React.FC = () => {
         bellCurve(REEL.SPIN.INITIAL_SPEED * 0.8, REEL.SPIN.INITIAL_SPEED * 1.2)
       )
 
-    setReelStates([1, 1, 1])
-    setTimeout(() => setReelStates([0, 1, 1]), 1000)
-    setTimeout(() => setReelStates([0, 0, 1]), 2000)
+    // Delay the spin start until the lever is at the bottom of its arc
+    // This creates a more satisfying interaction
     setTimeout(() => {
-      setReelStates([0, 0, 0])
-      setIsSpinning(false)
+      setIsSpinning(true)
 
-      // Trigger small shudder when stopping
-      if (screenShakeEnabled && shakeRef.current) {
-        shakeRef.current.style.animation = 'none'
-        shakeRef.current.offsetHeight // Trigger reflow
-        shakeRef.current.style.animation =
-          'shudder 0.3s cubic-bezier(.36,.07,.19,.97)'
-      }
-    }, 3000)
+      // Start all reels spinning at the same time with different speeds
+      setReelStates(speeds)
+
+      // Stagger the stopping of reels with shorter intervals for faster animation
+      setTimeout(() => setReelStates([0, ...speeds.slice(1)]), 800)
+      setTimeout(() => setReelStates([0, 0, ...speeds.slice(2)]), 1600)
+      setTimeout(() => setReelStates([0, 0, 0, ...speeds.slice(3)]), 2400)
+      setTimeout(() => setReelStates([0, 0, 0, 0, speeds[4]]), 3600)
+      setTimeout(() => {
+        setReelStates([0, 0, 0, 0, 0])
+        setIsSpinning(false)
+
+        // Trigger small shudder when stopping
+        if (screenShakeEnabled && shakeRef.current) {
+          shakeRef.current.style.animation = 'none'
+          shakeRef.current.offsetHeight // Trigger reflow
+          shakeRef.current.style.animation =
+            'shudder 0.3s cubic-bezier(.36,.07,.19,.97)'
+        }
+
+        // Calculate total score based on selected symbols
+        const score = selectedSymbols.reduce((total, symbol) => {
+          return total + SYMBOL_POINTS[symbol]
+        }, 0)
+        setTotalScore(score)
+
+        console.log('\nFinal Results:')
+        console.log('-------------')
+        selectedSymbols.forEach((symbol, index) => {
+          console.log(
+            `Reel ${index + 1}: ${symbol} (${SYMBOL_POINTS[symbol]} points)`
+          )
+        })
+        console.log(`Total Score: ${score}`)
+        console.log('-------------')
+
+        // Show particles for wins
+        if (score > 0) {
+          setParticleColor(score >= 100 ? '#FF0000' : '#FFD700') // Red for jackpot, gold for regular wins
+          setShowParticles(true)
+          soundManager.play(score >= 100 ? 'JACKPOT' : 'WIN')
+
+          // Hide particles after 3 seconds
+          setTimeout(() => {
+            setShowParticles(false)
+          }, 3000)
+        }
+      }, 4000)
+    }, 300) // Reduced delay to 300ms for faster lever animation
   }
 
   /**
    * Handle when a reel completes its spinning animation
    */
   const handleReelComplete = (index: number) => {
-    completedReels.current.add(index)
+    if (completedReelsRef.current.has(index)) return
 
-    // If all reels have completed, stop spinning and log final symbols
-    if (completedReels.current.size === 5) {
+    completedReelsRef.current.add(index)
+    soundManager.play('REEL_STOP')
+
+    // Check if all reels have completed
+    if (completedReelsRef.current.size === 5) {
       setIsSpinning(false)
-      console.log('\nFinal Results:')
-      console.log('-------------')
-      selectedSymbols.forEach((symbol, index) => {
-        console.log(`Reel ${index + 1}: ${symbol}`)
-      })
-      console.log('-------------')
+
+      // Calculate total score
+      const score = selectedSymbols.reduce((total, symbol) => {
+        return total + SYMBOL_POINTS[symbol]
+      }, 0)
+
+      setTotalScore(score)
+
+      // Show particles for wins
+      if (score > 0) {
+        setParticleColor(score >= 100 ? '#FF0000' : '#FFD700') // Red for jackpot, gold for regular wins
+        setShowParticles(true)
+        soundManager.play(score >= 100 ? 'JACKPOT' : 'WIN')
+
+        // Hide particles after 3 seconds
+        setTimeout(() => {
+          setShowParticles(false)
+        }, 3000)
+      }
     }
   }
 
@@ -157,7 +226,6 @@ const SlotMachine: React.FC = () => {
       <GameControls />
       <Canvas
         camera={{ position: CAMERA.POSITION, fov: CAMERA.FOV }}
-        onClick={handleLeverPull}
         style={{
           background: theme === 'matrix' ? '#000000' : '#ffffff',
           cursor: isSpinning ? 'not-allowed' : 'pointer',
@@ -166,33 +234,70 @@ const SlotMachine: React.FC = () => {
         <CameraController />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
-        <group>
-          {selectedSymbols.map((symbol, index) => (
-            <Reel
-              key={index}
-              position={[index * 1.2 - 2.4, 0, 0]}
-              initialSpeed={reelStates[index] === 1 ? 5 : 0}
-              isSpinning={reelStates[index] === 1}
-              onComplete={() => handleReelComplete(index)}
-              reelIndex={index}
-              onSymbolSelected={handleSymbolSelected}
-              selectedSymbol={symbol}
-            />
-          ))}
 
+        <AxisHelper position={[-5, 0, 0]} size={2} />
+
+        <group>
+          {/* Log-style frame around the reels */}
+          <LogFrame
+            position={[0, 0, -1.0]}
+            width={8}
+            height={5}
+            depth={2.5}
+            logThickness={0.3}
+          />
+
+          {/* Lever on the right side */}
           <Lever
-            position={[4, 0, 0]}
+            position={[4.5, 0, 0]}
             onPull={handleLeverPull}
             isSpinning={isSpinning}
           />
+
+          {/* Reels */}
+          {Array(5)
+            .fill(0)
+            .map((_, index) => (
+              <Reel
+                key={index}
+                position={[-4 + index * 2, 0, 0]}
+                initialSpeed={reelStates[index]}
+                isSpinning={isSpinning}
+                onComplete={() => handleReelComplete(index)}
+                reelIndex={index}
+                onSymbolSelected={handleSymbolSelected}
+                selectedSymbol={selectedSymbols[index]}
+              />
+            ))}
         </group>
+
+        {/* Purple geometric line for scoring reference */}
+        <GeometricLine
+          position={[0, 0, 2.2]}
+          length={10}
+          segments={20}
+          color="#800080"
+          lineWidth={0.05}
+          animationSpeed={2}
+        />
+
+        {/* Particle effects */}
+        <ParticleEffects
+          position={[0, 0, 0]}
+          count={200}
+          size={0.1}
+          color={particleColor}
+          speed={1}
+          spread={3}
+          active={showParticles}
+        />
       </Canvas>
 
       <div
         style={{
           position: 'absolute',
           bottom: '20px',
-          right: '20px',
+          left: '20px',
           backgroundColor: 'rgba(0, 20, 0, 0.8)',
           border: '1px solid #00ff00',
           color: '#00ff00',
@@ -205,9 +310,12 @@ const SlotMachine: React.FC = () => {
           zIndex: 1000,
         }}
       >
+        <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>
+          Score: {totalScore}
+        </div>
         {selectedSymbols.map((symbol, index) => (
           <div key={index} style={{ marginBottom: '4px' }}>
-            Reel {index + 1}: {symbol || 'null'}
+            Reel {index + 1}: {symbol} ({SYMBOL_POINTS[symbol]} pts)
           </div>
         ))}
       </div>
