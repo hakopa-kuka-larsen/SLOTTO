@@ -50,19 +50,51 @@ export const LEVER = {
 // Camera Configuration
 export const CAMERA = {
   ANGLE: (2.5 * Math.PI) / 180,
-  DISTANCE: 36,
+  DISTANCE: 52,
   FOV: 400,
   NEAR: 0.1,
   FAR: 1000,
 }
 
-// Lighting Configuration
-export const LIGHTING = {
-  AMBIENT: { intensity: 1.0 },
+interface PointLight {
+  position: [number, number, number]
+  intensity: number
+  distance: number
+  decay: number
+}
+
+interface DirectionalLight {
+  position: [number, number, number]
+  intensity: number
+  castShadow: boolean
+}
+
+interface LightingConfig {
+  AMBIENT: {
+    intensity: number
+  }
+  POINT: PointLight[]
+  DIRECTIONAL: DirectionalLight[]
+}
+
+export const LIGHTING: LightingConfig = {
+  AMBIENT: {
+    intensity: 0.5,
+  },
   POINT: [
-    { position: [0, 0, 0], intensity: 0.8 }, // Will be calculated dynamically
-    { position: [0, 5, 5], intensity: 0.5 },
-    { position: [0, -5, 5], intensity: 0.5 },
+    {
+      position: [5, 5, 5],
+      intensity: 0.8,
+      distance: 20,
+      decay: 2,
+    },
+  ],
+  DIRECTIONAL: [
+    {
+      position: [5, 5, 5],
+      intensity: 0.5,
+      castShadow: true,
+    },
   ],
 }
 

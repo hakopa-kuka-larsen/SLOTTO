@@ -274,10 +274,14 @@ const Reel: React.FC<ReelProps> = ({
                 position={[0, 0, 0.01]}
                 rotation={[0, 0, angle]}
                 fontSize={REEL.SYMBOL.SIZE}
-                color={isSelected ? '#FF0000' : SYMBOL_COLORS[symbol]}
+                color={isSelected ? '#00FF00' : SYMBOL_COLORS[symbol]}
                 anchorX="center"
                 anchorY="middle"
                 renderOrder={1}
+                fillOpacity={isSelected ? 1 : 0.8}
+                outlineWidth={isSelected ? 0.02 : 0}
+                outlineColor="#00FF00"
+                outlineOpacity={isSelected ? 0.5 : 0}
               >
                 {symbol}
               </Text>

@@ -8,29 +8,22 @@ import SlotMachineFrame from './SlotMachineFrame'
 import { CAMERA, LIGHTING, REEL_SPINNING, REEL } from '../utils/constants'
 import { bellCurve } from '../utils/probability'
 import { Symbol, SYMBOLS } from '../utils/symbols'
+import { Scene } from './Scene'
 
 interface DebugDisplayProps {
   reelIndex: number
   symbol: string | null
+  className?: string
 }
 
-const DebugDisplay: React.FC<DebugDisplayProps> = ({ reelIndex, symbol }) => {
+const DebugDisplay: React.FC<DebugDisplayProps> = ({
+  reelIndex,
+  symbol,
+  className,
+}) => {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: `${20 + reelIndex * 30}px`,
-        left: '20px',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        padding: '8px 12px',
-        borderRadius: '4px',
-        color: '#00ff00',
-        fontFamily: 'monospace',
-        fontSize: '14px',
-        zIndex: 1000,
-      }}
-    >
-      Reel {reelIndex + 1}: {symbol}
+    <div className={`debug-display ${className || ''}`}>
+      Reel {reelIndex + 1}: {symbol || 'null'}
     </div>
   )
 }
@@ -46,7 +39,6 @@ const SlotMachine: React.FC = () => {
     Array(5).fill(SYMBOLS[0])
   )
   const isDragging = useRef(false)
-  const mouseDownTime = useRef(0)
 
   /**
    * Handle the lever pull event
@@ -109,77 +101,61 @@ const SlotMachine: React.FC = () => {
   dynamicLighting[0].position = [cameraX, 0, cameraZ]
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Canvas
-        camera={{
-          position: [cameraX, 0, cameraZ],
-          fov: CAMERA.FOV,
-          near: CAMERA.NEAR,
-          far: CAMERA.FAR,
-        }}
-        dpr={[1, 2]}
-        onPointerDown={(event) => {
-          mouseDownTime.current = Date.now()
-        }}
-        onPointerUp={(event) => {
-          // If the pointer has moved significantly or we held for more than 200ms, it's a drag
-          const wasShortClick = Date.now() - mouseDownTime.current < 200
-          if (wasShortClick && !isDragging.current) {
-            handleLeverPull()
-          }
-          // Reset drag state
-          isDragging.current = false
+        onClick={handleLeverPull}
+        style={{
+          width: '100%',
+          height: '100%',
+          cursor: isSpinning ? 'not-allowed' : 'pointer',
         }}
       >
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={true}
-          onStart={() => {
-            isDragging.current = true
-          }}
-        />
-        <AxisHelper />
-
-        {/* Lighting setup */}
-        <ambientLight intensity={LIGHTING.AMBIENT.intensity} />
-        {dynamicLighting.map((light, index) => (
-          <pointLight
-            key={index}
-            position={light.position}
-            intensity={light.intensity}
-          />
-        ))}
-
-        {/* Slot machine frame */}
-        <SlotMachineFrame />
-
-        {/* Decorative Lever */}
-        <Lever
-          position={[4, -1, 0]}
-          onPull={() => {}}
-          isSpinning={isSpinning}
-        />
-
-        {/* Reels */}
-        {[...Array(5)].map((_, index) => (
-          <Reel
-            key={index}
-            position={[index * 1.2 - 2.4, 0, 0]}
-            initialSpeed={reelSpeeds[index] || 0}
-            isSpinning={isSpinning}
-            onComplete={() => handleReelComplete(index)}
-            reelIndex={index}
-            onSymbolSelected={handleSymbolSelected}
-            selectedSymbol={selectedSymbols[index]}
-          />
-        ))}
+        <Scene />
+        <OrbitControls enableZoom={false} enablePan={false} />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        <group>
+          {selectedSymbols.map((symbol, index) => (
+            <Reel
+              key={index}
+              position={[index * 1.2 - 2.4, 0, 0]}
+              initialSpeed={reelSpeeds[index] || 0}
+              isSpinning={isSpinning}
+              onComplete={() => handleReelComplete(index)}
+              reelIndex={index}
+              onSymbolSelected={handleSymbolSelected}
+              selectedSymbol={symbol}
+            />
+          ))}
+        </group>
       </Canvas>
-
-      {/* Debug displays */}
       {selectedSymbols.map((symbol, index) => (
-        <DebugDisplay key={index} reelIndex={index} symbol={symbol} />
+        <DebugDisplay
+          key={index}
+          reelIndex={index}
+          symbol={symbol}
+          className={isSpinning ? 'spinning' : ''}
+        />
       ))}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#00ff00',
+          fontFamily: 'monospace',
+          fontSize: '16px',
+          textShadow: '0 0 5px #00ff00',
+          textAlign: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '12px 20px',
+          borderRadius: '8px',
+          zIndex: 1000,
+        }}
+      >
+        {isSpinning ? 'Spinning...' : 'Click to spin...'}
+      </div>
     </div>
   )
 }

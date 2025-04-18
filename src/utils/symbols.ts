@@ -15,14 +15,14 @@ export type Symbol = (typeof SYMBOLS)[number]
 
 // Colors for each symbol (same order as SYMBOLS)
 export const SYMBOL_COLORS: Record<Symbol, string> = {
-  '🍎': '#E83B3B', // bright red
-  '🍐': '#7FBA4C', // sage green
-  '🍊': '#F5A742', // warm orange
-  '🍋': '#F5E642', // warm yellow
-  '🍇': '#9649CC', // grape purple
-  '🍉': '#FF6B7A', // watermelon pink
-  '🍓': '#FF4365', // strawberry red
-  '🍒': '#D1262E', // cherry red
+  '🍎': '#00FF00', // bright matrix green
+  '🍐': '#39FF14', // neon green
+  '🍊': '#32CD32', // lime green
+  '🍋': '#98FB98', // pale green
+  '🍇': '#90EE90', // light green
+  '🍉': '#7CFF00', // lawn green
+  '🍓': '#00FF7F', // spring green
+  '🍒': '#7FFF00', // chartreuse
 }
 
 // Weights for each symbol (same order as SYMBOLS)
