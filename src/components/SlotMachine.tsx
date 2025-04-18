@@ -129,14 +129,29 @@ const SlotMachine: React.FC = () => {
           ))}
         </group>
       </Canvas>
-      {selectedSymbols.map((symbol, index) => (
-        <DebugDisplay
-          key={index}
-          reelIndex={index}
-          symbol={symbol}
-          className={isSpinning ? 'spinning' : ''}
-        />
-      ))}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          right: '20px',
+          backgroundColor: 'rgba(0, 20, 0, 0.8)',
+          border: '1px solid #00ff00',
+          color: '#00ff00',
+          padding: '12px 16px',
+          borderRadius: '4px',
+          fontFamily: 'monospace',
+          fontSize: '14px',
+          textShadow: '0 0 5px #00ff00',
+          boxShadow: '0 0 10px rgba(0, 255, 0, 0.3)',
+          zIndex: 1000,
+        }}
+      >
+        {selectedSymbols.map((symbol, index) => (
+          <div key={index} style={{ marginBottom: '4px' }}>
+            Reel {index + 1}: {symbol || 'null'}
+          </div>
+        ))}
+      </div>
       <div
         style={{
           position: 'absolute',
