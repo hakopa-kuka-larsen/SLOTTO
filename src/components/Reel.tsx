@@ -9,9 +9,15 @@ import {
   LineBasicMaterial,
 } from 'three'
 import { Text } from '@react-three/drei'
-import { SYMBOLS, SYMBOL_COLORS, Symbol } from '../utils/symbols'
+import {
+  SYMBOLS,
+  SYMBOL_COLORS,
+  SYMBOL_WEIGHTS,
+  Symbol,
+} from '../utils/symbols'
 import { REEL } from '../utils/constants'
 import { weightedShuffle } from '../utils/probability'
+import { normalizeAngle } from '../utils/geometry'
 
 interface ReelProps {
   position: [number, number, number]
@@ -26,13 +32,6 @@ interface ReelProps {
 const SEGMENTS = 20 // Number of sides in the prism
 const SEGMENT_ANGLE = (Math.PI * 2) / SEGMENTS // Angle between each segment
 const SPIN_COOLDOWN = 500 // Half a second cooldown between spins
-
-/**
- * Normalizes an angle to be between 0 and 2π
- */
-const normalizeAngle = (angle: number): number => {
-  return ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
-}
 
 /**
  * Creates a prism geometry with the specified number of sides
@@ -104,7 +103,29 @@ const Reel: React.FC<ReelProps> = ({
   const isSnapping = useRef(false)
   const snapAnimationProgress = useRef(0)
   const snapStartRotation = useRef(0)
-  const reelSymbols = useRef(weightedShuffle([...SYMBOLS]))
+
+  // Create an array of exactly 20 symbols with weighted distribution
+  const createWeightedSymbols = (): Symbol[] => {
+    // Create a weighted array based on SYMBOL_WEIGHTS
+    const weightedSymbols: Symbol[] = []
+    SYMBOLS.forEach((symbol, index) => {
+      const weight = SYMBOL_WEIGHTS[index]
+      for (let i = 0; i < weight; i++) {
+        weightedSymbols.push(symbol)
+      }
+    })
+
+    // Shuffle the weighted array
+    const shuffled = [...weightedSymbols].sort(() => Math.random() - 0.5)
+
+    // Take exactly 20 symbols, repeating if necessary
+    return Array(20)
+      .fill(0)
+      .map((_, i) => shuffled[i % shuffled.length])
+  }
+
+  const reelSymbols = useRef<Symbol[]>(createWeightedSymbols())
+
   const hasCompletedSnap = useRef(false)
   const lineRef = useRef<Line>(null)
   const [canSpin, setCanSpin] = useState(true)
@@ -262,7 +283,7 @@ const Reel: React.FC<ReelProps> = ({
         {/* Symbols on each face */}
         {reelSymbols.current.map((symbol, index) => {
           // Calculate angle for each symbol to ensure equidistant placement
-          const angle = (index / SEGMENTS) * Math.PI * 2
+          const angle = (index / 20) * Math.PI * 2 // Use 20 for exact spacing
           // Calculate position on the circumference
           const x = REEL.RADIUS * Math.cos(angle)
           const z = REEL.RADIUS * Math.sin(angle)

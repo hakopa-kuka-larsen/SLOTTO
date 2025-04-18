@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react'
-import { Canvas } from '@react-three/fiber'
+import React, { useState, useRef, useEffect } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import Reel from './Reel'
 import Lever from './Lever'
@@ -8,7 +8,10 @@ import SlotMachineFrame from './SlotMachineFrame'
 import { CAMERA, LIGHTING, REEL_SPINNING, REEL } from '../utils/constants'
 import { bellCurve } from '../utils/probability'
 import { Symbol, SYMBOLS } from '../utils/symbols'
-import { Scene } from './Scene'
+import { useGame } from '../context/GameContext'
+import GameControls from './GameControls'
+import { Vector3 } from 'three'
+import { useCameraTransition } from '../hooks/useCameraTransition'
 
 interface DebugDisplayProps {
   reelIndex: number
@@ -28,17 +31,33 @@ const DebugDisplay: React.FC<DebugDisplayProps> = ({
   )
 }
 
+const CameraController: React.FC = () => {
+  const { controlsRef, cameraMode } = useCameraTransition()
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      enableZoom={cameraMode === 'free'}
+      enablePan={cameraMode === 'free'}
+      enableRotate={cameraMode === 'free'}
+      enabled={cameraMode === 'free'}
+    />
+  )
+}
+
 /**
  * Main SlotMachine component that orchestrates the slot machine game
  */
 const SlotMachine: React.FC = () => {
+  const { theme, screenShakeEnabled } = useGame()
   const [isSpinning, setIsSpinning] = useState(false)
-  const [reelSpeeds, setReelSpeeds] = useState<number[]>([])
+  const [reelStates, setReelStates] = useState([0, 0, 0])
   const completedReels = useRef<Set<number>>(new Set())
   const [selectedSymbols, setSelectedSymbols] = useState<Symbol[]>(
     Array(5).fill(SYMBOLS[0])
   )
   const isDragging = useRef(false)
+  const shakeRef = useRef<HTMLDivElement>(null)
 
   /**
    * Handle the lever pull event
@@ -46,6 +65,15 @@ const SlotMachine: React.FC = () => {
   const handleLeverPull = () => {
     if (isSpinning) return
 
+    // Trigger screen shake when spinning starts
+    if (screenShakeEnabled && shakeRef.current) {
+      shakeRef.current.style.animation = 'none'
+      shakeRef.current.offsetHeight // Trigger reflow
+      shakeRef.current.style.animation =
+        'shake 0.5s cubic-bezier(.36,.07,.19,.97)'
+    }
+
+    setIsSpinning(true)
     // Reset completed reels tracking
     completedReels.current.clear()
 
@@ -59,8 +87,21 @@ const SlotMachine: React.FC = () => {
         bellCurve(REEL.SPIN.INITIAL_SPEED * 0.8, REEL.SPIN.INITIAL_SPEED * 1.2)
       )
 
-    setReelSpeeds(speeds)
-    setIsSpinning(true)
+    setReelStates([1, 1, 1])
+    setTimeout(() => setReelStates([0, 1, 1]), 1000)
+    setTimeout(() => setReelStates([0, 0, 1]), 2000)
+    setTimeout(() => {
+      setReelStates([0, 0, 0])
+      setIsSpinning(false)
+
+      // Trigger small shudder when stopping
+      if (screenShakeEnabled && shakeRef.current) {
+        shakeRef.current.style.animation = 'none'
+        shakeRef.current.offsetHeight // Trigger reflow
+        shakeRef.current.style.animation =
+          'shudder 0.3s cubic-bezier(.36,.07,.19,.97)'
+      }
+    }, 3000)
   }
 
   /**
@@ -92,26 +133,37 @@ const SlotMachine: React.FC = () => {
     }
   }
 
-  // Calculate camera position
-  const cameraX = Math.sin(CAMERA.ANGLE) * CAMERA.DISTANCE
-  const cameraZ = Math.cos(CAMERA.ANGLE) * CAMERA.DISTANCE
-
-  // Calculate dynamic lighting position
-  const dynamicLighting = [...LIGHTING.POINT]
-  dynamicLighting[0].position = [cameraX, 0, cameraZ]
-
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      ref={shakeRef}
+      style={{ width: '100vw', height: '100vh', position: 'relative' }}
+    >
+      <style>
+        {`
+          @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+          }
+          @keyframes shudder {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(1px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-2px, 0, 0); }
+            40%, 60% { transform: translate3d(2px, 0, 0); }
+          }
+        `}
+      </style>
+      <GameControls />
       <Canvas
+        camera={{ position: CAMERA.POSITION, fov: CAMERA.FOV }}
         onClick={handleLeverPull}
         style={{
-          width: '100%',
-          height: '100%',
+          background: theme === 'matrix' ? '#000000' : '#ffffff',
           cursor: isSpinning ? 'not-allowed' : 'pointer',
         }}
       >
-        <Scene />
-        <OrbitControls enableZoom={false} enablePan={false} />
+        <CameraController />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} />
         <group>
@@ -119,16 +171,23 @@ const SlotMachine: React.FC = () => {
             <Reel
               key={index}
               position={[index * 1.2 - 2.4, 0, 0]}
-              initialSpeed={reelSpeeds[index] || 0}
-              isSpinning={isSpinning}
+              initialSpeed={reelStates[index] === 1 ? 5 : 0}
+              isSpinning={reelStates[index] === 1}
               onComplete={() => handleReelComplete(index)}
               reelIndex={index}
               onSymbolSelected={handleSymbolSelected}
               selectedSymbol={symbol}
             />
           ))}
+
+          <Lever
+            position={[4, 0, 0]}
+            onPull={handleLeverPull}
+            isSpinning={isSpinning}
+          />
         </group>
       </Canvas>
+
       <div
         style={{
           position: 'absolute',
@@ -152,6 +211,7 @@ const SlotMachine: React.FC = () => {
           </div>
         ))}
       </div>
+
       <div
         style={{
           position: 'absolute',
@@ -169,7 +229,7 @@ const SlotMachine: React.FC = () => {
           zIndex: 1000,
         }}
       >
-        {isSpinning ? 'Spinning...' : 'Click to spin...'}
+        {isSpinning ? 'Spinning...' : 'Pull the lever to spin...'}
       </div>
     </div>
   )

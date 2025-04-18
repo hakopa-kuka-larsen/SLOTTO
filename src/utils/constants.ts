@@ -49,12 +49,13 @@ export const LEVER = {
 
 // Camera Configuration
 export const CAMERA = {
-  ANGLE: (2.5 * Math.PI) / 180,
-  DISTANCE: 52,
-  FOV: 400,
+  ANGLE: Math.PI / 4,
+  DISTANCE: 10,
+  FOV: 75,
   NEAR: 0.1,
   FAR: 1000,
-}
+  POSITION: [0, 0, 5] as [number, number, number],
+} as const
 
 interface PointLight {
   position: [number, number, number]
