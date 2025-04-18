@@ -104,7 +104,11 @@ const Reel: React.FC<ReelProps> = ({
   const isSnapping = useRef(false)
   const snapAnimationProgress = useRef(0)
   const snapStartRotation = useRef(0)
-  const reelSymbols = useRef(weightedShuffle([...SYMBOLS]))
+  const reelSymbols = useRef(
+    Array(20)
+      .fill(0)
+      .map((_, i) => SYMBOLS[i % SYMBOLS.length])
+  )
   const hasCompletedSnap = useRef(false)
   const lineRef = useRef<Line>(null)
   const [canSpin, setCanSpin] = useState(true)
@@ -262,7 +266,7 @@ const Reel: React.FC<ReelProps> = ({
         {/* Symbols on each face */}
         {reelSymbols.current.map((symbol, index) => {
           // Calculate angle for each symbol to ensure equidistant placement
-          const angle = (index / SEGMENTS) * Math.PI * 2
+          const angle = (index / 20) * Math.PI * 2 // Use 20 for exact spacing
           // Calculate position on the circumference
           const x = REEL.RADIUS * Math.cos(angle)
           const z = REEL.RADIUS * Math.sin(angle)
