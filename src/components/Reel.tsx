@@ -17,6 +17,7 @@ import {
 } from '../utils/symbols'
 import { REEL } from '../utils/constants'
 import { weightedShuffle } from '../utils/probability'
+import { normalizeAngle } from '../utils/geometry'
 
 interface ReelProps {
   position: [number, number, number]
@@ -31,13 +32,6 @@ interface ReelProps {
 const SEGMENTS = 20 // Number of sides in the prism
 const SEGMENT_ANGLE = (Math.PI * 2) / SEGMENTS // Angle between each segment
 const SPIN_COOLDOWN = 500 // Half a second cooldown between spins
-
-/**
- * Normalizes an angle to be between 0 and 2π
- */
-const normalizeAngle = (angle: number): number => {
-  return ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)
-}
 
 /**
  * Creates a prism geometry with the specified number of sides

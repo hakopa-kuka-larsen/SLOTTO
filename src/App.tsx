@@ -1,4 +1,5 @@
 import React from 'react'
+import { GameProvider } from './context/GameContext'
 import SlotMachine from './components/SlotMachine'
 import './App.css'
 
@@ -7,9 +8,9 @@ import './App.css'
  */
 const App: React.FC = () => {
   return (
-    <div className="app-container">
+    <GameProvider>
       <SlotMachine />
-    </div>
+    </GameProvider>
   )
 }
 

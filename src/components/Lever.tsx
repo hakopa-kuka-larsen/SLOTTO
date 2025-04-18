@@ -16,36 +16,47 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
   const leverRef = useRef<Mesh>(null)
   const [isPulling, setIsPulling] = useState(false)
   const pullProgress = useRef(0)
+  const returnProgress = useRef(0)
+  const isReturning = useRef(false)
   const springEffect = useRef(0)
+  const pauseTimer = useRef(0)
+  const PAUSE_DURATION = 0.5 // Pause for 0.5 seconds at the bottom
+  const RETURN_DURATION = 1.0 // Return over 1 second
 
   // Handle lever animation
   useFrame((_, delta) => {
     if (!leverRef.current) return
 
     if (isPulling) {
-      // Slow start (first 20% of the pull)
-      if (pullProgress.current < 0.2) {
-        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 0.3
+      // Very slow start (first 10% of the pull)
+      if (pullProgress.current < 0.1) {
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 0.1
       }
-      // Acceleration in the middle (20-80% of the pull)
-      else if (pullProgress.current < 0.8) {
-        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 1.5
+      // Super snappy acceleration in the middle (10-85% of the pull)
+      else if (pullProgress.current < 0.85) {
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 3.5
       }
-      // Spring effect at the end (80-100% of the pull)
+      // Dramatic KACHONK effect at the end (85-100% of the pull)
       else if (pullProgress.current < 1) {
-        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 2.5
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 4.0
       }
 
       if (pullProgress.current >= 1) {
-        pullProgress.current = 0
+        pullProgress.current = 1
         setIsPulling(false)
+        isReturning.current = true
+        returnProgress.current = 0
+        pauseTimer.current = 0
+        springEffect.current = 0.2 // Stronger initial spring effect
         onPull()
       }
 
-      // Apply spring effect at the end of the pull
-      if (pullProgress.current > 0.9) {
+      // Apply dramatic spring effect at the end of the pull
+      if (pullProgress.current > 0.85) {
+        // Create a more dramatic "KACHONK" effect with multiple oscillations
         springEffect.current =
-          Math.sin((pullProgress.current - 0.9) * 10) * 0.05
+          Math.sin((pullProgress.current - 0.85) * 20) * 0.15 + // Fast oscillation
+          Math.sin((pullProgress.current - 0.85) * 10) * 0.1 // Slower oscillation
       }
 
       // Rotate from start angle to end angle with spring effect
@@ -53,12 +64,28 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
         LEVER.ROTATION.START +
         (Math.PI / 2) * pullProgress.current +
         springEffect.current
-    } else if (!isSpinning) {
-      // Return to original position at the original speed
-      const currentRotation = leverRef.current.rotation.x
-      const targetRotation = LEVER.ROTATION.START
-      leverRef.current.rotation.x +=
-        (targetRotation - currentRotation) * LEVER.ROTATION.RETURN_SPEED
+    } else if (isReturning.current) {
+      // First pause at the bottom
+      if (pauseTimer.current < PAUSE_DURATION) {
+        pauseTimer.current += delta
+        // Keep the lever at the bottom position during pause
+        leverRef.current.rotation.x = LEVER.ROTATION.START + Math.PI / 2
+      }
+      // Then slowly return to the top over 1 second
+      else {
+        returnProgress.current += delta / RETURN_DURATION
+
+        if (returnProgress.current >= 1) {
+          returnProgress.current = 1
+          isReturning.current = false
+          // Reset the lever to its starting position
+          leverRef.current.rotation.x = LEVER.ROTATION.START
+        } else {
+          // Smooth return from bottom to top
+          leverRef.current.rotation.x =
+            LEVER.ROTATION.START + (Math.PI / 2) * (1 - returnProgress.current)
+        }
+      }
     }
   })
 
@@ -68,6 +95,7 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
     if (
       !isSpinning &&
       !isPulling &&
+      !isReturning.current &&
       leverRef.current &&
       Math.abs(leverRef.current.rotation.x - LEVER.ROTATION.START) < 0.05
     ) {
