@@ -16,23 +16,45 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
   const leverRef = useRef<Mesh>(null)
   const [isPulling, setIsPulling] = useState(false)
   const pullProgress = useRef(0)
+  const springEffect = useRef(0)
 
   // Handle lever animation
   useFrame((_, delta) => {
     if (!leverRef.current) return
 
     if (isPulling) {
-      pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED
+      // Slow start (first 20% of the pull)
+      if (pullProgress.current < 0.2) {
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 0.3
+      }
+      // Acceleration in the middle (20-80% of the pull)
+      else if (pullProgress.current < 0.8) {
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 1.5
+      }
+      // Spring effect at the end (80-100% of the pull)
+      else if (pullProgress.current < 1) {
+        pullProgress.current += delta * LEVER.ROTATION.PULL_SPEED * 2.5
+      }
+
       if (pullProgress.current >= 1) {
         pullProgress.current = 0
         setIsPulling(false)
         onPull()
       }
-      // Rotate from start angle to end angle
+
+      // Apply spring effect at the end of the pull
+      if (pullProgress.current > 0.9) {
+        springEffect.current =
+          Math.sin((pullProgress.current - 0.9) * 10) * 0.05
+      }
+
+      // Rotate from start angle to end angle with spring effect
       leverRef.current.rotation.x =
-        LEVER.ROTATION.START + (Math.PI / 2) * pullProgress.current
+        LEVER.ROTATION.START +
+        (Math.PI / 2) * pullProgress.current +
+        springEffect.current
     } else if (!isSpinning) {
-      // Return to original position
+      // Return to original position at the original speed
       const currentRotation = leverRef.current.rotation.x
       const targetRotation = LEVER.ROTATION.START
       leverRef.current.rotation.x +=
@@ -42,8 +64,16 @@ const Lever: React.FC<LeverProps> = ({ position, onPull, isSpinning }) => {
 
   // Handle pointer down event
   const handlePointerDown = () => {
-    if (!isSpinning && !isPulling) {
+    // Only allow pulling when the lever is at its starting position
+    if (
+      !isSpinning &&
+      !isPulling &&
+      leverRef.current &&
+      Math.abs(leverRef.current.rotation.x - LEVER.ROTATION.START) < 0.05
+    ) {
       setIsPulling(true)
+      pullProgress.current = 0
+      springEffect.current = 0
     }
   }
 
