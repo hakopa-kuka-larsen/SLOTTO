@@ -103,7 +103,6 @@ const SlotMachine: React.FC = () => {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Canvas
-        onClick={handleLeverPull}
         style={{
           width: '100%',
           height: '100%',
@@ -112,8 +111,6 @@ const SlotMachine: React.FC = () => {
       >
         <Scene />
         <OrbitControls enableZoom={true} enablePan={false} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
         <group>
           {selectedSymbols.map((symbol, index) => (
             <Reel
@@ -127,8 +124,15 @@ const SlotMachine: React.FC = () => {
               selectedSymbol={symbol}
             />
           ))}
+
+          <Lever
+            position={[4, 0, 0]}
+            onPull={handleLeverPull}
+            isSpinning={isSpinning}
+          />
         </group>
       </Canvas>
+
       <div
         style={{
           position: 'absolute',
@@ -152,6 +156,7 @@ const SlotMachine: React.FC = () => {
           </div>
         ))}
       </div>
+
       <div
         style={{
           position: 'absolute',
@@ -169,7 +174,7 @@ const SlotMachine: React.FC = () => {
           zIndex: 1000,
         }}
       >
-        {isSpinning ? 'Spinning...' : 'Click to spin...'}
+        {isSpinning ? 'Spinning...' : 'Pull the lever to spin...'}
       </div>
     </div>
   )
