@@ -68,8 +68,21 @@ const SlotMachine: React.FC = () => {
 
   // Start background music when component mounts
   useEffect(() => {
-    soundManager.play('BACKGROUND')
+    // Initialize audio context on first user interaction
+    const handleInteraction = async () => {
+      await soundManager.initialize()
+      soundManager.play('BACKGROUND')
+      // Remove event listeners after initialization
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
+    }
+
+    document.addEventListener('click', handleInteraction)
+    document.addEventListener('keydown', handleInteraction)
+
     return () => {
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
       soundManager.stopBackground()
     }
   }, [])
@@ -241,7 +254,7 @@ const SlotMachine: React.FC = () => {
           {/* Log-style frame around the reels */}
           <LogFrame
             position={[0, 0, -1.0]}
-            width={8}
+            width={6}
             height={5}
             depth={2.5}
             logThickness={0.3}
@@ -249,7 +262,7 @@ const SlotMachine: React.FC = () => {
 
           {/* Lever on the right side */}
           <Lever
-            position={[4.5, 0, 0]}
+            position={[3.5, 0, 0]}
             onPull={handleLeverPull}
             isSpinning={isSpinning}
           />
@@ -260,7 +273,7 @@ const SlotMachine: React.FC = () => {
             .map((_, index) => (
               <Reel
                 key={index}
-                position={[-4 + index * 2, 0, 0]}
+                position={[-3 + index * 1.5, 0, 0]}
                 initialSpeed={reelStates[index]}
                 isSpinning={isSpinning}
                 onComplete={() => handleReelComplete(index)}

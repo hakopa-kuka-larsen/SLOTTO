@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { initAudio } from '../utils/music'
 
 type Theme = 'matrix' | 'default'
 type CameraMode = 'fixed' | 'free'
@@ -20,6 +21,24 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({
   const [theme, setTheme] = useState<Theme>('default')
   const [screenShakeEnabled, setScreenShakeEnabled] = useState(true)
   const [cameraMode, setCameraMode] = useState<CameraMode>('free')
+
+  // Initialize audio on first user interaction
+  useEffect(() => {
+    const handleFirstInteraction = async () => {
+      await initAudio()
+      // Remove event listeners after initialization
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+
+    document.addEventListener('click', handleFirstInteraction)
+    document.addEventListener('keydown', handleFirstInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+  }, [])
 
   return (
     <GameContext.Provider

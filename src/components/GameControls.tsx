@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useGame } from '../context/GameContext'
 import '../styles/animations.css'
 import soundManager from '../utils/sounds'
+import { setVolume, toggleMute } from '../utils/music'
 
 interface ToggleProps {
   isActive: boolean
@@ -71,8 +72,15 @@ const GameControls: React.FC = () => {
   const controlsRef = useRef<HTMLDivElement>(null)
   const buttonSize = 48 // Size of the circular button
   const margin = 20 // Margin from the edge of the screen
-  const [isMuted, setIsMuted] = React.useState(false)
-  const [volume, setVolume] = React.useState(0.5)
+  const [isMuted, setIsMuted] = React.useState(true) // Set muted to true by default
+  const [volume, setVolumeState] = React.useState(0.5)
+
+  // Initialize mute state on component mount
+  useEffect(() => {
+    // Ensure both sound systems are muted by default
+    soundManager.toggleMute() // This will set isMuted to true in soundManager
+    toggleMute() // This will set isMuted to true in music system
+  }, [])
 
   // Handle click outside
   useEffect(() => {
@@ -91,15 +99,18 @@ const GameControls: React.FC = () => {
     }
   }, [])
 
-  const toggleMute = () => {
-    soundManager.toggleMute()
-    setIsMuted(!isMuted)
-  }
-
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value)
-    setVolume(newVolume)
+    setVolumeState(newVolume)
     soundManager.setVolume(newVolume)
+    setVolume(newVolume)
+  }
+
+  const handleMuteToggle = () => {
+    const newMuteState = !isMuted
+    setIsMuted(newMuteState)
+    soundManager.toggleMute() // Toggle sound manager mute state
+    toggleMute() // Toggle music system mute state
   }
 
   const toggleTheme = () => {
@@ -114,8 +125,53 @@ const GameControls: React.FC = () => {
         top: margin,
         right: margin,
         zIndex: 1000,
+        display: 'flex',
+        gap: '10px',
       }}
     >
+      {/* Mute Button */}
+      <button
+        onClick={handleMuteToggle}
+        style={{
+          width: `${buttonSize}px`,
+          height: `${buttonSize}px`,
+          borderRadius: '50%',
+          backgroundColor: '#00ff00',
+          border: 'none',
+          cursor: 'pointer',
+          display: isExpanded ? 'none' : 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          boxShadow: '0 2px 8px rgba(0, 255, 0, 0.3)',
+          transition: 'transform 0.3s ease',
+        }}
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#000000"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          {isMuted ? (
+            <>
+              <path d="M11 5L6 9H2v6h4l5 4V5z" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </>
+          ) : (
+            <>
+              <path d="M11 5L6 9H2v6h4l5 4V5z" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </>
+          )}
+        </svg>
+      </button>
+
       {/* Settings Panel */}
       <div
         style={{
@@ -207,29 +263,6 @@ const GameControls: React.FC = () => {
                 e.currentTarget.style.opacity = '0.7'
               }}
             />
-            <button
-              onClick={toggleMute}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#00ff00',
-                cursor: 'pointer',
-                fontSize: '16px',
-                padding: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'transform 0.2s',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-              }}
-            >
-              {isMuted ? '🔇' : '🔊'}
-            </button>
           </div>
         </div>
       </div>

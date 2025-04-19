@@ -1,0 +1,11 @@
+Model Information:
+* title:	Animated Cow 3D Model
+* source:	https://sketchfab.com/3d-models/animated-cow-3d-model-f6b57842f0ed4dd89977d42c29929ac8
+* author:	3DModelsFree (https://sketchfab.com/3DModels4Free)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Animated Cow 3D Model" (https://sketchfab.com/3d-models/animated-cow-3d-model-f6b57842f0ed4dd89977d42c29929ac8) by 3DModelsFree (https://sketchfab.com/3DModels4Free) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

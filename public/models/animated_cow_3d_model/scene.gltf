@@ -1,0 +1,760 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 32800,
+      "max": [
+        0.4172443151473999,
+        1.22848379611969,
+        1.5280342102050781
+      ],
+      "min": [
+        -0.4172443449497223,
+        -1.5416507720947266,
+        -0.005759628489613533
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 393600,
+      "componentType": 5126,
+      "count": 32800,
+      "max": [
+        0.9999963045120239,
+        0.9999900460243225,
+        1.0
+      ],
+      "min": [
+        -0.9999967813491821,
+        -0.9999995231628418,
+        -0.9999837875366211
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 32800,
+      "max": [
+        0.9994158744812012,
+        0.9907761812210083
+      ],
+      "min": [
+        0.00023800758935976774,
+        0.00046968681272119284
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 176760,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 787200,
+      "componentType": 5126,
+      "count": 1028,
+      "max": [
+        0.12980538606643677,
+        -1.2554887533187866,
+        1.3303489685058594
+      ],
+      "min": [
+        -0.12980538606643677,
+        -1.3262006044387817,
+        1.2596405744552612
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 799536,
+      "componentType": 5126,
+      "count": 1028,
+      "max": [
+        0.9962561130523682,
+        0.9958040118217468,
+        0.9956127405166626
+      ],
+      "min": [
+        -0.9962560534477234,
+        -0.996264636516571,
+        -0.9957446455955505
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 262400,
+      "componentType": 5126,
+      "count": 1028,
+      "max": [
+        0.44234180450439453,
+        0.979527473449707
+      ],
+      "min": [
+        0.03287696838378906,
+        0.7209187746047974
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 707040,
+      "componentType": 5125,
+      "count": 5760,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 811872,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.12855783104896545,
+        -1.256048560142517,
+        1.3297885656356812
+      ],
+      "min": [
+        -0.12855783104896545,
+        -1.3256436586380005,
+        1.2601970434188843
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 828072,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.9962558150291443,
+        0.9958050847053528,
+        0.995610237121582
+      ],
+      "min": [
+        -0.9962557554244995,
+        -0.9962624907493591,
+        -0.996889054775238
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.9986382722854614,
+        0.9957273006439209,
+        0.9999338984489441,
+        1.0
+      ],
+      "min": [
+        -0.9986382722854614,
+        -0.9953856468200684,
+        -0.9992994666099548,
+        -1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 270624,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.9882621765136719,
+        0.9422687888145447
+      ],
+      "min": [
+        0.007733345031738281,
+        0.014865294098854065
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 281424,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.9882621765136719,
+        0.9422687888145447
+      ],
+      "min": [
+        0.007733345031738281,
+        0.014865294098854065
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 292224,
+      "componentType": 5126,
+      "count": 1350,
+      "max": [
+        0.9882621765136719,
+        0.9422687888145447
+      ],
+      "min": [
+        0.007733345031738281,
+        0.014865294098854065
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 730080,
+      "componentType": 5125,
+      "count": 7104,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 844272,
+      "componentType": 5126,
+      "count": 780,
+      "max": [
+        0.3158714175224304,
+        -1.1334010362625122,
+        1.4850802421569824
+      ],
+      "min": [
+        -0.3158714175224304,
+        -1.4028127193450928,
+        1.3917183876037598
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 853632,
+      "componentType": 5126,
+      "count": 780,
+      "max": [
+        0.9956181049346924,
+        0.9998235106468201,
+        0.9831829071044922
+      ],
+      "min": [
+        -0.9956179857254028,
+        -0.9994645118713379,
+        -0.9993149638175964
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 303024,
+      "componentType": 5126,
+      "count": 780,
+      "max": [
+        0.9970613718032837,
+        0.9858697652816772
+      ],
+      "min": [
+        0.6488975286483765,
+        0.1499554067850113
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 758496,
+      "componentType": 5125,
+      "count": 3960,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 862992,
+      "componentType": 5126,
+      "count": 676,
+      "max": [
+        0.12462541460990906,
+        -1.269899606704712,
+        1.2976677417755127
+      ],
+      "min": [
+        -0.12460991740226746,
+        -1.322769045829773,
+        1.2637907266616821
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 871104,
+      "componentType": 5126,
+      "count": 676,
+      "max": [
+        0.998960554599762,
+        0.98321533203125,
+        0.9999979138374329
+      ],
+      "min": [
+        -0.9988313317298889,
+        -0.9957661032676697,
+        -0.9994828701019287
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 774336,
+      "componentType": 5125,
+      "count": 4032,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "3DModelsFree (https://sketchfab.com/3DModels4Free)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/animated-cow-3d-model-f6b57842f0ed4dd89977d42c29929ac8",
+      "title": "Animated Cow 3D Model"
+    },
+    "generator": "Sketchfab-16.64.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 790464,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 309264,
+      "byteOffset": 790464,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 879216,
+      "byteOffset": 1099728,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 21600,
+      "byteOffset": 1978944,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2000544,
+      "uri": "scene.bin"
+    }
+  ],
+  "extensionsRequired": [
+    "KHR_materials_pbrSpecularGlossiness"
+  ],
+  "extensionsUsed": [
+    "KHR_materials_pbrSpecularGlossiness"
+  ],
+  "images": [
+    {
+      "uri": "textures/Cattle_Body_diffuse.png"
+    },
+    {
+      "uri": "textures/Cattle_Eyes_diffuse.png"
+    },
+    {
+      "uri": "textures/Cattle_Pupil_normal.png"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseFactor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "diffuseTexture": {
+            "index": 0
+          },
+          "glossinessFactor": 0.12588150813790247,
+          "specularFactor": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "name": "Cattle_Body"
+    },
+    {
+      "alphaMode": "BLEND",
+      "doubleSided": true,
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseFactor": [
+            1.0,
+            1.0,
+            1.0,
+            0.0
+          ],
+          "diffuseTexture": {
+            "index": 1
+          },
+          "glossinessFactor": 0.0006245921340026916,
+          "specularFactor": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "name": "Cattle_Eyes"
+    },
+    {
+      "doubleSided": true,
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseFactor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "diffuseTexture": {
+            "index": 1
+          },
+          "glossinessFactor": 0.012115623435112875,
+          "specularFactor": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "name": "Cattle_Pupil",
+      "normalTexture": {
+        "index": 2
+      }
+    },
+    {
+      "doubleSided": true,
+      "extensions": {
+        "KHR_materials_pbrSpecularGlossiness": {
+          "diffuseFactor": [
+            0.324788,
+            0.14041,
+            0.104625,
+            1.0
+          ],
+          "glossinessFactor": 0.054693172754041924,
+          "specularFactor": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "name": "Cattle_Tears"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cattle_Body_Cattle_Body_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Cattle_Eyes_Cattle_Eyes_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 5,
+            "POSITION": 4,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Cattle_Eyes_Cattle_Pupil_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 9,
+            "POSITION": 8,
+            "TANGENT": 10,
+            "TEXCOORD_0": 11,
+            "TEXCOORD_1": 12,
+            "TEXCOORD_2": 13
+          },
+          "indices": 14,
+          "material": 2,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Cattle_Horn_Cattle_Body_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 16,
+            "POSITION": 15,
+            "TEXCOORD_0": 17
+          },
+          "indices": 18,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Cattle_Tears_Cattle_Tears_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 20,
+            "POSITION": 19
+          },
+          "indices": 21,
+          "material": 3,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.009999999776482582,
+        0.0,
+        0.0,
+        -0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "316d6654bcf1408cb0415566055cf53e.fbx"
+    },
+    {
+      "children": [
+        3,
+        5,
+        8,
+        10
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.629206793918314e-05,
+        -99.99999999999868,
+        0.0,
+        0.0,
+        99.99999999999868,
+        -1.629206793918314e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Cattle_Body"
+    },
+    {
+      "mesh": 0,
+      "name": "Cattle_Body_Cattle_Body_0"
+    },
+    {
+      "children": [
+        6,
+        7
+      ],
+      "matrix": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.629206793918314e-05,
+        -99.99999999999868,
+        0.0,
+        0.0,
+        99.99999999999868,
+        -1.629206793918314e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Cattle_Eyes"
+    },
+    {
+      "mesh": 1,
+      "name": "Cattle_Eyes_Cattle_Eyes_0"
+    },
+    {
+      "mesh": 2,
+      "name": "Cattle_Eyes_Cattle_Pupil_0"
+    },
+    {
+      "children": [
+        9
+      ],
+      "matrix": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.629206793918314e-05,
+        -99.99999999999868,
+        0.0,
+        0.0,
+        99.99999999999868,
+        -1.629206793918314e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Cattle_Horn"
+    },
+    {
+      "mesh": 3,
+      "name": "Cattle_Horn_Cattle_Body_0"
+    },
+    {
+      "children": [
+        11
+      ],
+      "matrix": [
+        100.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.629206793918314e-05,
+        -99.99999999999868,
+        0.0,
+        0.0,
+        99.99999999999868,
+        -1.629206793918314e-05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Cattle_Tears"
+    },
+    {
+      "mesh": 4,
+      "name": "Cattle_Tears_Cattle_Tears_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ]
+}

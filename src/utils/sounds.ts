@@ -12,8 +12,9 @@ export const SOUNDS = {
 class SoundManager {
   private sounds: Record<string, HTMLAudioElement> = {}
   private backgroundMusic: HTMLAudioElement | null = null
-  private isMuted: boolean = false
+  private isMuted: boolean = true
   private volume: number = 0.5
+  private isInitialized: boolean = false
 
   constructor() {
     // Preload all sounds
@@ -21,31 +22,52 @@ class SoundManager {
       if (key !== 'BACKGROUND') {
         this.sounds[key] = new Audio(path)
         this.sounds[key].volume = this.volume
+        this.sounds[key].muted = true
       }
     })
 
     // Initialize background music
     this.backgroundMusic = new Audio(SOUNDS.BACKGROUND)
     this.backgroundMusic.loop = true
-    this.backgroundMusic.volume = this.volume * 0.3 // Lower volume for background music
+    this.backgroundMusic.volume = this.volume * 0.3
+    this.backgroundMusic.muted = true
   }
 
-  play(soundName: keyof typeof SOUNDS): void {
+  async initialize() {
+    if (this.isInitialized) return
+
+    // Create a temporary audio context and resume it
+    const audioContext = new (window.AudioContext ||
+      (window as any).webkitAudioContext)()
+    await audioContext.resume()
+    this.isInitialized = true
+  }
+
+  async play(soundName: keyof typeof SOUNDS): Promise<void> {
     if (this.isMuted) return
+
+    // Initialize audio context if not already done
+    if (!this.isInitialized) {
+      await this.initialize()
+    }
 
     if (soundName === 'BACKGROUND') {
       if (this.backgroundMusic) {
-        this.backgroundMusic
-          .play()
-          .catch((err) => console.log('Background music play failed:', err))
+        try {
+          await this.backgroundMusic.play()
+        } catch (err) {
+          console.log('Background music play failed:', err)
+        }
       }
     } else if (this.sounds[soundName]) {
       // Clone the audio to allow overlapping sounds
       const sound = this.sounds[soundName].cloneNode() as HTMLAudioElement
       sound.volume = this.volume
-      sound
-        .play()
-        .catch((err) => console.log(`Sound ${soundName} play failed:`, err))
+      try {
+        await sound.play()
+      } catch (err) {
+        console.log(`Sound ${soundName} play failed:`, err)
+      }
     }
   }
 
